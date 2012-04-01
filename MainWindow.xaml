@@ -6,7 +6,13 @@
    Height="350"
    Width="525"
    Loaded="Window_Loaded">
-   <Grid>
-
-   </Grid>
+   <Canvas>
+      <Image
+         Canvas.Left="40"
+         Canvas.Top="33"
+         Height="150"
+         Name="imgBummsn"
+         Stretch="Fill"
+         Width="200" />
+   </Canvas>
 </Window>
