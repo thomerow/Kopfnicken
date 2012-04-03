@@ -10,6 +10,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Kinect;
 using System.Diagnostics;
+using Midi;
 
 
 namespace Kopfnicken
@@ -19,6 +20,9 @@ namespace Kopfnicken
    /// </summary>
    public partial class MainWindow : Window
    {
+      protected Clock _midiClock;
+      protected OutputDevice _devOut;
+
       struct ColorFrameData
       {
          public byte[] Data;           // Data
@@ -30,6 +34,9 @@ namespace Kopfnicken
       private ColorFrameData _imgCur;        // Current color frame grabbed by the Kinect's camera
       private Skeleton _skeleton = null;     // Curently tracked skeleton
 
+      private const double[] HeadPosRangeHiHatOpen = null;     // Range the head has to be in to open the hi hat
+      private const double[] HeadPosRangeKickKicked = null;    // Range the head has to be in to kick the kick drum
+
       public MainWindow()
       {
          InitializeComponent();
@@ -37,6 +44,13 @@ namespace Kopfnicken
 
       private void Window_Loaded(object sender, RoutedEventArgs e)
       {
+         int nSelectedMidiDevice = 0;
+         WndMIDIDeviceSelection wndDevSel = new WndMIDIDeviceSelection();
+
+         _midiClock = new Clock(120);
+
+         // ToDo…
+
          KinectStart();
       }
 
@@ -158,7 +172,7 @@ namespace Kopfnicken
       }
 
       private void ProcessHeadPosition(float p)
-      {
+      {         
          // ToDo: implement
       }
 
@@ -167,12 +181,17 @@ namespace Kopfnicken
          DepthImageFrame frame = e.OpenDepthImageFrame();
          if (frame == null) return;
 
-         ColorImagePoint p = frame.MapToColorImagePoint(10, 10, ColorImageFormat.RgbResolution640x480Fps30);
+         // ColorImagePoint p = frame.MapToColorImagePoint(10, 10, ColorImageFormat.RgbResolution640x480Fps30);
          //p.
 
          // ToDo: implement
 
          frame.Dispose();
+      }
+
+      private void SliderHeadPosZ01_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+      {
+
       }
    }
 }

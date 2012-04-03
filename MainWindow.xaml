@@ -7,12 +7,14 @@
    Width="525"
    Loaded="Window_Loaded">
    <Canvas>
-      <Image
-         Canvas.Left="40"
-         Canvas.Top="33"
-         Height="150"
-         Name="imgBummsn"
-         Stretch="Fill"
-         Width="200" />
+      <Slider
+         Canvas.Left="92"
+         Canvas.Top="52"
+         Height="188"
+         Minimum="-2"
+         Maximum="2"
+         Name="_sliderHeadPosZ01"
+         ValueChanged="SliderHeadPosZ01_ValueChanged"
+         Orientation="Vertical" />
    </Canvas>
 </Window>
