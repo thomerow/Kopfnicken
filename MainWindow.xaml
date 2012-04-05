@@ -11,10 +11,10 @@
    <Canvas
       Height="453">
       <Label
-         Canvas.Left="104"
+         Canvas.Left="133"
          Canvas.Top="0"
          Content="--"
-         Name="_lblHeadPos"
+         Name="_lblPosHead"
          FontSize="56" />
       <Label
          Canvas.Left="12"
@@ -22,5 +22,17 @@
          Content="Head position:"
          Height="28"
          Name="_lblHeadPosDesc" />
+      <Label
+         Canvas.Left="133"
+         Canvas.Top="77"
+         Content="--"
+         FontSize="56"
+         Name="_lblPosRightHand" />
+      <Label
+         Canvas.Left="12"
+         Canvas.Top="111"
+         Content="Right Hand position:"
+         Height="28"
+         Name="label2" />
    </Canvas>
 </Window>

@@ -41,11 +41,29 @@ namespace Kopfnicken
       {
          InitializeComponent();
 
-         _regKick = new MonitoredRegion() { From = 0.1, To = 0.2 };
-         _regHihat = new MonitoredRegion();
-         _regSnare = new MonitoredRegion();
+         _regKick = new MonitoredRegion() { From = 0.08, To = 0.2 };
+         _regHihat = new MonitoredRegion() { From = -0.3, To = 0.08 };
+         _regSnare = new MonitoredRegion() { From = 0.6, To = 2 };
 
          _regKick.MonitoredPositionEntersRegion += new EventHandler(Kick_MonitoredPositionEntersRegion);
+         _regHihat.MonitoredPositionEntersRegion += new EventHandler(Hihat_MonitoredPositionEntersRegion);
+         _regHihat.MonitoredPositionLeavesRegion += new EventHandler(Hihat_MonitoredPositionLeavesRegion);
+         _regSnare.MonitoredPositionEntersRegion += new EventHandler(Snare_MonitoredPositionEntersRegion);
+      }
+
+      void Snare_MonitoredPositionEntersRegion(object sender, EventArgs e)
+      {
+         _drumKit.HitTheSnare();
+      }
+
+      void Hihat_MonitoredPositionLeavesRegion(object sender, EventArgs e)
+      {
+         _drumKit.CloseHiHat();
+      }
+
+      void Hihat_MonitoredPositionEntersRegion(object sender, EventArgs e)
+      {
+         _drumKit.OpenHiHat();
       }
 
       void Kick_MonitoredPositionEntersRegion(object sender, EventArgs e)
@@ -114,14 +132,15 @@ namespace Kopfnicken
 
          _bInitializingSensor = true;
 
-         _sensor.SkeletonStream.Enable(new TransformSmoothParameters()     // Enable skeleton tracking with a bit of smoothing
-         {
-            Smoothing = 0.05f,
-            Correction = 0.1f,
-            Prediction = 0.1f,
-            JitterRadius = 0.05f,
-            MaxDeviationRadius = 0.04f
-         });
+         //_sensor.SkeletonStream.Enable(new TransformSmoothParameters()     // Enable skeleton tracking with a bit of smoothing
+         //{
+         //   Smoothing = 0.5f,
+         //   Correction = 0.5f,
+         //   Prediction = 0.5f,
+         //   JitterRadius = 0.05f,
+         //   MaxDeviationRadius = 0.04f
+         //});
+         _sensor.SkeletonStream.Enable();
 
          _sensor.DepthStream.Enable(DepthImageFormat.Resolution320x240Fps30);
          _sensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
@@ -165,11 +184,27 @@ namespace Kopfnicken
             {
                _skeleton = s;
                TrackHeadAndShoulders(s.Joints);
+               TrackRightHand(s.Joints);
                break;   // Exit loop after processing one skeleton (for now)
             }
          }
 
          frame.Dispose();
+      }
+
+      private void TrackRightHand(JointCollection joints)
+      {
+         Joint jRightHand = joints[JointType.HandRight];
+         Joint jShoulderCenter = joints[JointType.ShoulderCenter];
+
+         ProcessRightHandPosition(jShoulderCenter.Position.Z - jRightHand.Position.Z);
+      }
+
+      private void ProcessRightHandPosition(float p)
+      {
+         _lblPosRightHand.Content = p.ToString("0.000");
+
+         _regSnare.MonitoredPosition = p;
       }
 
       private void TrackHeadAndShoulders(JointCollection joints)
@@ -185,11 +220,10 @@ namespace Kopfnicken
 
       private void ProcessHeadPosition(float p)
       {
-         _lblHeadPos.Content = p.ToString("0.000");
+         _lblPosHead.Content = p.ToString("0.000");
 
          _regKick.MonitoredPosition =
-         _regHihat.MonitoredPosition =
-         _regSnare.MonitoredPosition = p;
+         _regHihat.MonitoredPosition = p;
       }
 
       void Sensor_DepthFrameReady(object sender, DepthImageFrameReadyEventArgs e)

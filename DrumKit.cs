@@ -18,8 +18,8 @@ namespace Kopfnicken
       {
          KickDrum = Pitch.C1,
          SnareDrum = Pitch.D1,
-         ClosedHiHat = Pitch.FSharp1,
-         OpenHiHat = Pitch.ASharp1,
+         ClosedHiHat = Pitch.F1,
+         OpenHiHat = Pitch.FSharp1,
       }
 
       public bool IsHiHatOpen { get; private set; }
@@ -37,26 +37,24 @@ namespace Kopfnicken
 
       public void OpenHiHat()
       {
+         if (IsHiHatOpen) return;
          IsHiHatOpen = true;
 
-         Debug.WriteLine(MethodInfo.GetCurrentMethod().Name);
-         // ToDo: implement
+         NoteOn((Pitch)InstrumentPitch.OpenHiHat, 100);
       }
 
       public void CloseHiHat()
       {
          if (!IsHiHatOpen) return;
-
-         Debug.WriteLine(MethodInfo.GetCurrentMethod().Name);
-         // ToDo: implement
-
          IsHiHatOpen = false;
+
+         SendNote((Pitch)InstrumentPitch.ClosedHiHat, 100, 0.2f);
+         NoteOff((Pitch)InstrumentPitch.OpenHiHat);
       }
 
       public void HitTheSnare()
       {
-         Debug.WriteLine(MethodInfo.GetCurrentMethod().Name);
-         // ToDo: implement
+         SendNote((Pitch)InstrumentPitch.SnareDrum, 100, 0.2f);
       }
 
       protected static void UseOutputDevice(Midi.OutputDevice odNew)
