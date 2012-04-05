@@ -30,7 +30,13 @@ namespace Kopfnicken
          get { return _lbDevices; }
       }
 
-      protected void _btnSelect_Click(object sender, RoutedEventArgs e)
+      protected void BtnSelect_Click(object sender, RoutedEventArgs e)
+      {
+         SelectedIndex = _lbDevices.SelectedIndex;
+         Close();
+      }
+
+      private void LbDevices_MouseDoubleClick(object sender, MouseButtonEventArgs e)
       {
          SelectedIndex = _lbDevices.SelectedIndex;
          Close();

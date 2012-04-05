@@ -44,14 +44,47 @@ namespace Kopfnicken
 
       private void Window_Loaded(object sender, RoutedEventArgs e)
       {
-         int nSelectedMidiDevice = 0;
-         WndMIDIDeviceSelection wndDevSel = new WndMIDIDeviceSelection();
-
          _midiClock = new Clock(120);
 
-         // ToDo…
+         ShowMIDIDevSelDialog();
 
          KinectStart();
+      }
+
+      private void ShowMIDIDevSelDialog()
+      {
+         int nSelectedMidiDevice = 0;
+
+         WndMIDIDeviceSelection wndDevSel = new WndMIDIDeviceSelection();
+
+         // Find last used output device
+         foreach (OutputDevice od in OutputDevice.InstalledDevices)
+         {
+            int nIdxTmp = wndDevSel._lbDevices.Items.Add(od.Name);
+            if (od.Name == Properties.Settings.Default.MIDIOutputDeviceName) nSelectedMidiDevice = nIdxTmp;
+         }
+
+         if (wndDevSel.ListBox.Items.Count > 0)
+         {
+            wndDevSel.ListBox.SelectedIndex = nSelectedMidiDevice;
+            wndDevSel.ShowDialog();
+
+            UseOutputDevice(OutputDevice.InstalledDevices[wndDevSel.ListBox.SelectedIndex]);
+         }
+         else
+         {
+            MessageBox.Show("No MIDI input devices found.", "MIDI Devices Missing", MessageBoxButton.OK, MessageBoxImage.Warning);
+         }
+      }
+
+      protected void UseOutputDevice(Midi.OutputDevice odNew)
+      {
+         if ((odNew == _devOut) || (odNew == null)) return;
+         if (_midiClock.IsRunning) { _midiClock.Stop(); _midiClock.Reset(); }
+         if ((_devOut != null) && _devOut.IsOpen) _devOut.Close();
+         _devOut = odNew;
+         _devOut.Open();
+         _midiClock.Start();
       }
 
       private void KinectStart()
@@ -142,6 +175,7 @@ namespace Kopfnicken
       {
          _skeleton = null;
          SkeletonFrame frame = e.OpenSkeletonFrame();
+         if (frame == null) return;
          if (frame.SkeletonArrayLength == 0) return;  // No skeleton found
 
          Skeleton[] skeletons = new Skeleton[frame.SkeletonArrayLength];
@@ -192,6 +226,24 @@ namespace Kopfnicken
       private void SliderHeadPosZ01_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
       {
 
+      }
+
+      private void Window_Closed(object sender, EventArgs e)
+      {
+
+         // Shut down kinect
+         if (_sensor != null) {
+            if (_sensor.Status == KinectStatus.Connected) _sensor.Stop();
+         }
+
+         // Shut down midi
+         if (_midiClock.IsRunning) _midiClock.Stop();
+         if ((_devOut != null) && _devOut.IsOpen)
+         {
+            Properties.Settings.Default.MIDIOutputDeviceName = _devOut.Name;
+            _devOut.Close();
+         }
+         Properties.Settings.Default.Save();
       }
    }
 }
