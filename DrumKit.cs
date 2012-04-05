@@ -14,6 +14,14 @@ namespace Kopfnicken
       protected static Clock _midiClock;
       protected static OutputDevice _devOut;
 
+      enum InstrumentPitch
+      {
+         KickDrum = Pitch.C1,
+         SnareDrum = Pitch.D1,
+         ClosedHiHat = Pitch.FSharp1,
+         OpenHiHat = Pitch.ASharp1,
+      }
+
       public bool IsHiHatOpen { get; private set; }
 
       static DrumKit()
@@ -22,10 +30,9 @@ namespace Kopfnicken
          ShowMIDIDevSelDialog();
       }
 
-      public void KickTheKick() 
+      public void KickTheKick()
       {
-         Debug.WriteLine(MethodInfo.GetCurrentMethod().Name);
-         // ToDo: implement
+         SendNote((Pitch)InstrumentPitch.KickDrum, 100, 0.5f);
       }
 
       public void OpenHiHat()
@@ -93,6 +100,20 @@ namespace Kopfnicken
          if ((_devOut == null) || !_devOut.IsOpen || !_midiClock.IsRunning) return;
 
          _midiClock.Schedule(new NoteOnOffMessage(_devOut, Channel.Channel1, pitch, velocity, _midiClock.Time, _midiClock, fDuration));
+      }
+
+      private void NoteOn(Pitch pitch, int velocity)
+      {
+         if ((_devOut == null) || !_devOut.IsOpen || !_midiClock.IsRunning) return;
+
+         _midiClock.Schedule(new NoteOnMessage(_devOut, Channel.Channel1, pitch, velocity, _midiClock.Time));
+      }
+
+      private void NoteOff(Pitch pitch)
+      {
+         if ((_devOut == null) || !_devOut.IsOpen || !_midiClock.IsRunning) return;
+
+         _midiClock.Schedule(new NoteOffMessage(_devOut, Channel.Channel1, pitch, 100, _midiClock.Time));
       }
 
       internal static void ShutDownMIDI()

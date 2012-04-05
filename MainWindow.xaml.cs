@@ -20,6 +20,8 @@ namespace Kopfnicken
    public partial class MainWindow : Window
    {
       internal DrumKit _drumKit;
+      private bool _bInitializingSensor = true;
+      private MonitoredRegion _regKick, _regHihat, _regSnare;
 
       struct ColorFrameData
       {
@@ -38,6 +40,17 @@ namespace Kopfnicken
       public MainWindow()
       {
          InitializeComponent();
+
+         _regKick = new MonitoredRegion() { From = 0.1, To = 0.2 };
+         _regHihat = new MonitoredRegion();
+         _regSnare = new MonitoredRegion();
+
+         _regKick.MonitoredPositionEntersRegion += new EventHandler(Kick_MonitoredPositionEntersRegion);
+      }
+
+      void Kick_MonitoredPositionEntersRegion(object sender, EventArgs e)
+      {
+         _drumKit.KickTheKick();
       }
 
       private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -99,14 +112,17 @@ namespace Kopfnicken
       {
          if (_sensor == null) return;
 
+         _bInitializingSensor = true;
+
          _sensor.SkeletonStream.Enable(new TransformSmoothParameters()     // Enable skeleton tracking with a bit of smoothing
          {
-            Smoothing = 0.5f,
-            Correction = 0.5f,
-            Prediction = 0.5f,
+            Smoothing = 0.05f,
+            Correction = 0.1f,
+            Prediction = 0.1f,
             JitterRadius = 0.05f,
             MaxDeviationRadius = 0.04f
          });
+
          _sensor.DepthStream.Enable(DepthImageFormat.Resolution320x240Fps30);
          _sensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
          _sensor.Start();
@@ -115,6 +131,8 @@ namespace Kopfnicken
          _sensor.DepthFrameReady += Sensor_DepthFrameReady;
          _sensor.SkeletonFrameReady += Sensor_SkeletonFrameReady;
          _sensor.ColorFrameReady += Sensor_ColorFrameReady;
+
+         _bInitializingSensor = false;
       }
 
       void Sensor_ColorFrameReady(object sender, ColorImageFrameReadyEventArgs e)
@@ -166,8 +184,12 @@ namespace Kopfnicken
       }
 
       private void ProcessHeadPosition(float p)
-      {         
-         // ToDo: implement
+      {
+         _lblHeadPos.Content = p.ToString("0.000");
+
+         _regKick.MonitoredPosition =
+         _regHihat.MonitoredPosition =
+         _regSnare.MonitoredPosition = p;
       }
 
       void Sensor_DepthFrameReady(object sender, DepthImageFrameReadyEventArgs e)
@@ -182,13 +204,6 @@ namespace Kopfnicken
 
          frame.Dispose();
       }
-
-      private void SliderHeadPosZ01_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-      {
-         // ToDo: implement
-         throw new NotImplementedException();
-      }
-
 
       private void Window_Closed(object sender, EventArgs e)
       {

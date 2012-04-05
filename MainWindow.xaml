@@ -3,19 +3,24 @@
    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
    Title="MainWindow"
-   Height="350"
-   Width="525"
+   Height="592"
+   Width="754"
    Loaded="Window_Loaded"
-   Closed="Window_Closed">
-   <Canvas>
-      <Slider
-         Canvas.Left="92"
-         Canvas.Top="52"
-         Height="188"
-         Minimum="-2"
-         Maximum="2"
-         Name="_sliderHeadPosZ01"
-         ValueChanged="SliderHeadPosZ01_ValueChanged"
-         Orientation="Vertical" />
+   Closed="Window_Closed"
+   ResizeMode="NoResize">
+   <Canvas
+      Height="453">
+      <Label
+         Canvas.Left="104"
+         Canvas.Top="0"
+         Content="--"
+         Name="_lblHeadPos"
+         FontSize="56" />
+      <Label
+         Canvas.Left="12"
+         Canvas.Top="34"
+         Content="Head position:"
+         Height="28"
+         Name="_lblHeadPosDesc" />
    </Canvas>
 </Window>
