@@ -197,7 +197,7 @@ namespace Kopfnicken
          Joint jRightHand = joints[JointType.HandRight];
          Joint jShoulderCenter = joints[JointType.ShoulderCenter];
 
-         ProcessRightHandPosition(jShoulderCenter.Position.Z - jRightHand.Position.Z);
+         ProcessRightHandPosition(jRightHand.Position.X - jShoulderCenter.Position.X);
       }
 
       private void ProcessRightHandPosition(float p)
